@@ -57,6 +57,13 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		centerGear();
+		//goStraight();
+		//leftGear();
+		//rightGear();
+	}
+	
+	void centerGear() {
 		double angle = gyro.getAngle();
 		double matchTime = timer.get();
 		if (matchTime < 0.6969) { 
@@ -65,18 +72,57 @@ public class Robot extends IterativeRobot {
 			myRobot.drive(-0.3333, -angle* Kp);
 		} else if ( (matchTime >= 1.9) && (matchTime < 4.9)) {
 			myRobot.drive(0.0, 0.0);
-		} else if ( (matchTime >=4.9) && (matchTime < 15.0)) {
+		} /*else if ( (matchTime >=4.9) && (matchTime < 15.0)) {
 			if ( angle > -180.0 ) {
 				myRobot.drive(0.5, Math.exp(-18.0/24.5));
 			} else {
 				myRobot.drive(0.5, -(-180 - angle) * Kp);
 			} 
-		} else {
+		}*/ else {
 			myRobot.drive(0.0, 0.0); // stop robot
 		}
-				
 	}
 	
+	void rightGear (){
+		double angle = gyro.getAngle();
+		double matchTime = timer.get();
+		if (matchTime < 0.6969) {									//begin drive forward 
+			myRobot.drive(-0.5, -angle * Kp);
+		} else if ( (matchTime >= 0.6969) && (matchTime < 1.9) ) {	//slow down at line
+			myRobot.drive(-0.3333, -angle* Kp);
+		} else if ((matchTime > 1.9) && (matchTime < 2.9)){			//stop at line
+			myRobot.drive(0.0, 0.0);
+		} else if ( (matchTime >= 2.9) && (matchTime < 4.9)) {		//rotate
+			if (Math.abs(angle) < 60.0) {
+				myRobot.drive(-0.3, -Math.exp(-12.25/24.5));
+			} else {
+				myRobot.drive(-0.3, (-60 - angle) * Kp);			//move forward
+			}
+		}else if ((matchTime >= 4.9) && (matchTime < 7.9)){		//stop at gear station
+			myRobot.drive(0.0, 0.0);
+		} /*else if ((matchTime >= 7.9) && (matchTime < 11.9)){		//back up from gear station
+			if (angle < 0){
+				myRobot.drive(0.3, Math.exp(-12.25/24.5));
+			}else {
+				myRobot.drive(0.3, (-angle) * Kp);
+			}
+		} else if ( (matchTime >=11.9) && (matchTime < 13.9)) {		//drive to white line	
+			myRobot.drive(-0.5, (-angle)* Kp);
+		}*/ else {
+			myRobot.drive(0.0, 0.0); // stop robot
+		}
+	}
+	
+	void goStraight(){
+		double angle = gyro.getAngle();
+		double matchTime = timer.get();
+		
+		if (matchTime < 6.0)
+			myRobot.drive(-0.5, -angle * Kp);
+		else
+			myRobot.drive(0.0, 0.0);
+	}
+
 
 	/**
 	 * This function is called once each time the robot enters tele-operated
@@ -94,25 +140,38 @@ public class Robot extends IterativeRobot {
 		
 		boolean upButton = stick.getRawButton(5);
 		boolean downButton = stick.getRawButton(6);
-		
+		boolean ballUpButton = stick.getRawButton(1);
+		boolean ballDownButton = stick.getRawButton(2);
+		 
 		if (upButton) {
-			// winch.set(1.0);
-			ballMotor.set(1.0);
+			winch.set(1.0);
 		} else {
 			if (!downButton) 
-				// winch.set(0.0);
-				ballMotor.set(0.0);
+				winch.set(0.0);
 		}
-		
 		
 		if (downButton) {
-			// winch.set(-1.0);
-			ballMotor.set(-1.0);
+			winch.set(-1.0);
 		} else {
 			if (!upButton)
-				// winch.set(0.0);
+				winch.set(0.0);
+		}
+		
+		if (ballUpButton) {
+			ballMotor.set(1.0);
+		} else {
+			if (!ballDownButton) 
 				ballMotor.set(0.0);
 		}
+		
+		if (ballDownButton) {
+			ballMotor.set(-1.0);
+		} else {
+			if (!ballUpButton)
+				ballMotor.set(0.0);
+		}
+
+		
 		myRobot.arcadeDrive(stick, true);  // true for squaredInputs (decrease sensitivity for small inputs)
 
 	}
