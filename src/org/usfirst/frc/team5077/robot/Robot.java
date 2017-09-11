@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
-import com.ctre.CANTalon;
+// import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -21,19 +21,31 @@ import edu.wpi.first.wpilibj.Talon;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	RobotDrive myRobot = new RobotDrive(0, 1, 2, 3);
-	Joystick stick = new Joystick(0);
-	Timer timer = new Timer();
-	Gyro gyro = new ADXRS450_Gyro();
-	Talon winch = new Talon(4);
-	CANTalon leftDoor = new CANTalon(0);
-	Talon rightDoor = new Talon(5);
+	RobotDrive myRobot;
+	Joystick stick;
+	Timer timer;
+	Gyro gyro;
+	Talon winch;
+	// CANTalon leftDoor;
+	// Talon rightDoor;
 	
 	double Kp = 0.004; // Scaling constant. Tells the Gyro how quickly to correct for straightness.
 	
 	boolean buttonPressed = false;
 	long doorOpenTime = (long) 0.0;
 	
+	
+	public Robot(){
+		System.out.println("***In constructor****");
+		myRobot = new RobotDrive(0, 1, 2, 3);
+		stick = new Joystick(0);
+		timer = new Timer();
+		gyro = new ADXRS450_Gyro();
+		winch = new Talon(4);
+		// leftDoor = new CANTalon(21);
+		// rightDoor = new Talon(5);
+		System.out.println("***Leaving constructor");
+	}
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -65,19 +77,20 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic () {
+		System.out.println("timer: " + timer.get());
 		//centerGear();
 		//goStraight();
-		//leftGear();
-		rightGear();
+		leftGear();
+		//rightGear();
 	}
 	
 	void centerGear () {
 		double angle = gyro.getAngle();
 		double matchTime = timer.get();
 		if (matchTime < 0.6969) { 
-			myRobot.drive(-0.5, -angle * Kp);
+			myRobot.drive(0.5, -angle * Kp);
 		} else if ((matchTime >= 0.6969) && (matchTime < 1.9)) {
-			myRobot.drive(-0.3333, -angle* Kp);
+			myRobot.drive(0.3333, -angle* Kp);
 		} else if ((matchTime >= 1.9) && (matchTime < 4.9)) {
 			myRobot.drive(0.0, 0.0);
 		} /*else if ((matchTime >=4.9) && (matchTime < 15.0)) {
@@ -91,54 +104,39 @@ public class Robot extends IterativeRobot {
 		}
 	}
 	
-	void rightGear () {
-		double angle = gyro.getAngle();
-		double matchTime = timer.get();
-		if (matchTime < 0.6969) {									//begin drive forward 
-			myRobot.drive(-0.5, -angle * Kp);
-		} else if ((matchTime >= 0.6969) && (matchTime < 1.9) ) {	//slow down at line
-			myRobot.drive(-0.3333, -angle* Kp);
-		} else if ((matchTime > 1.9) && (matchTime < 2.9)){			//stop at line
-			myRobot.drive(0.0, 0.0);
-		} else if ((matchTime >= 2.9) && (matchTime < 6.5)) {		//rotate
-			if (Math.abs(angle) < 60.0) {
-				myRobot.drive(-0.75, -Math.exp(-12.25/24.5));
-			} else {
-				myRobot.drive(-0.3, (-60 - angle) * Kp);			//move forward
-			}
-		}else if ((matchTime >= 6.5) && (matchTime < 7.9)){		//stop at gear station
-			myRobot.drive(0.0, 0.0);
-		} /*else if ((matchTime >= 7.9) && (matchTime < 11.9)){		//back up from gear station
-			if (angle < 0){
-				myRobot.drive(0.3, Math.exp(-12.25/24.5));
-			}else {
-				myRobot.drive(0.3, (-angle) * Kp);
-			}
-		} else if ( (matchTime >=11.9) && (matchTime < 13.9)) {		//drive to white line	
-			myRobot.drive(-0.5, (-angle)* Kp);
-		}*/ else {
-			myRobot.drive(0.0, 0.0); // stop robot
-		}
-	}
-	
 	void leftGear () {
 		double angle = gyro.getAngle();
 		double matchTime = timer.get();
 		if (matchTime < 0.6969) {									//begin drive forward 
-			myRobot.drive(-0.5, -angle * Kp);
+			myRobot.drive(0.75, -angle * Kp);
 		} else if ((matchTime >= 0.6969) && (matchTime < 1.9) ) {	//slow down at line
-			myRobot.drive(-0.3333, -angle* Kp);
+			myRobot.drive(0.3333, -angle* Kp);
 		} else if ((matchTime > 1.9) && (matchTime < 2.9)){			//stop at line
 			myRobot.drive(0.0, 0.0);
-		} else if ((matchTime >= 2.9) && (matchTime < 6.5)) {		//rotate
+		} else if ((matchTime >= 2.9) && (matchTime < 4.9)) {		//rotate
 			if (Math.abs(angle) < 60.0) {
-				myRobot.drive(-0.75, Math.exp(-12.25/24.5));
+				myRobot.drive(0.3, Math.exp(-12.25/24.5));
 			} else {
-				myRobot.drive(-0.3, (60 - angle) * Kp);			//move forward
+				myRobot.drive(0.0, 0.0);
 			}
-		}else if ((matchTime >= 6.5) && (matchTime < 7.9)){		//stop at gear station
+		} else if ((matchTime >= 4.9) && (matchTime < 6.5)) {
+			myRobot.drive(0.5, -(60 - angle) * Kp);			//move forward
+			
+		}else if ((matchTime >= 6.5) && (matchTime < 7.0)){		//stop at gear station
 			myRobot.drive(0.0, 0.0);
-		} /*else if ((matchTime >= 7.9) && (matchTime < 11.9)){		//back up from gear station
+		} else if (matchTime >=7.0 && matchTime < 7.3){
+			myRobot.drive(0.0, 0.0);
+			// rightDoor.set(0.5);
+			// leftDoor.set((0.5));
+		
+		} else if (matchTime >= 7.3 && matchTime < 7.6){
+			
+			// rightDoor.set(-0.05);
+			// leftDoor.set((-0.05)); 
+		
+		} else if (matchTime >= 7.6 && matchTime < 8.1) {
+			myRobot.drive(.5, -(60 - angle) *Kp);
+		/*else if ((matchTime >= 7.9) && (matchTime < 11.9)){		//back up from gear station
 			if (angle < 0){
 				myRobot.drive(0.3, Math.exp(-12.25/24.5));
 			}else {
@@ -146,8 +144,54 @@ public class Robot extends IterativeRobot {
 			}
 		} else if ( (matchTime >=11.9) && (matchTime < 13.9)) {		//drive to white line	
 			myRobot.drive(-0.5, (-angle)* Kp);
-		}*/ else {
+		}*/
+		} else {
 			myRobot.drive(0.0, 0.0); // stop robot
+			
+		}
+	}
+	
+	void rightGear () {
+		double angle = gyro.getAngle();
+		double matchTime = timer.get();
+		if (matchTime < 0.6969) {									//begin drive forward 
+			myRobot.drive(0.75, -angle * Kp);
+		} else if ((matchTime >= 0.6969) && (matchTime < 1.9) ) {	//slow down at line
+			myRobot.drive(0.3333, -angle* Kp);
+		} else if ((matchTime > 1.9) && (matchTime < 2.9)){			//stop at line
+			myRobot.drive(0.0, 0.0);
+		} else if ((matchTime >= 2.9) && (matchTime < 6.5)) {		//rotate
+			if (Math.abs(angle) < 60.0) {
+				myRobot.drive(0.5, Math.exp(-12.25/24.5));
+			} else {
+				myRobot.drive(0.5, (60 - angle) * Kp);			//move forward
+			}
+		}else if ((matchTime >= 6.5) && (matchTime < 7.0)){		//stop at gear station
+			myRobot.drive(0.0, 0.0);
+		} else if (matchTime >=7.0 && matchTime < 7.3){
+			myRobot.drive(0.0, 0.0);
+			// rightDoor.set(0.5);
+			// leftDoor.set((0.5));
+		
+		} else if (matchTime >= 7.3 && matchTime < 7.6){
+			
+			// rightDoor.set(-0.05);
+			// leftDoor.set((-0.05));
+		/*else if ((matchTime >= 7.9) && (matchTime < 11.9)){		//back up from gear station
+
+			if (angle < 0){
+				myRobot.drive(0.3, Math.exp(-12.25/24.5));
+			}else {
+				myRobot.drive(0.3, (-angle) * Kp);
+			}
+		} else if ( (matchTime >=11.9) && (matchTime < 13.9)) {		//drive to white line	
+			myRobot.drive(-0.5, (-angle)* Kp);
+		}*/ 
+		} else if (matchTime >= 7.6 && matchTime < 8.1) {
+			myRobot.drive(.5, (60 - angle) *Kp);
+		} else {
+			myRobot.drive(0.0, 0.0); // stop robot
+			
 		}
 	}
 	
@@ -180,14 +224,14 @@ public class Robot extends IterativeRobot {
 		boolean openGearDoorButton = stick.getRawButton(1);
 		 
 		if (upButton) {
-			winch.set(1.0);
+			winch.set(0.75);
 		} else {
 			if (!downButton) 
 				winch.set(0.0);
 		}
 		
 		if (downButton) {
-			winch.set(-1.0);
+			winch.set(-0.75);
 		} else {
 			if (!upButton)
 				winch.set(0.0);
@@ -211,18 +255,18 @@ public class Robot extends IterativeRobot {
 		}
 		
 		if ((System.currentTimeMillis() - doorOpenTime) >= 300){
-			rightDoor.set(0.0);
-			leftDoor.set((0.0));
+			// rightDoor.set(0.0);
+			// leftDoor.set((0.0));
 		} else {
-			rightDoor.set(-1.0);
-			leftDoor.set((1.0));
+			// rightDoor.set(0.5);
+			// leftDoor.set((0.5));
 		}
 	
 	}
 	
 	void CloseDoors () {
-		rightDoor.set(0.12);
-		leftDoor.set((-0.12));
+		// rightDoor.set(-0.05);
+		// leftDoor.set((-0.05));
 	}
 
 	/**
