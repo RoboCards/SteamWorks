@@ -28,13 +28,13 @@ public class Robot extends IterativeRobot {
 	Talon winch;
 	// CANTalon leftDoor;
 	// Talon rightDoor;
-	
+
 	double Kp = 0.004; // Scaling constant. Tells the Gyro how quickly to correct for straightness.
-	
+
 	boolean buttonPressed = false;
 	long doorOpenTime = (long) 0.0;
-	
-	
+
+
 	public Robot(){
 		System.out.println("***In constructor****");
 		myRobot = new RobotDrive(0, 1, 2, 3);
@@ -83,11 +83,11 @@ public class Robot extends IterativeRobot {
 		leftGear();
 		//rightGear();
 	}
-	
+
 	void centerGear () {
 		double angle = gyro.getAngle();
 		double matchTime = timer.get();
-		if (matchTime < 0.6969) { 
+		if (matchTime < 0.6969) {
 			myRobot.drive(0.5, -angle * Kp);
 		} else if ((matchTime >= 0.6969) && (matchTime < 1.9)) {
 			myRobot.drive(0.3333, -angle* Kp);
@@ -98,16 +98,16 @@ public class Robot extends IterativeRobot {
 				myRobot.drive(0.5, Math.exp(-18.0/24.5));
 			} else {
 				myRobot.drive(0.5, -(-180 - angle) * Kp);
-			} 
+			}
 		}*/ else {
 			myRobot.drive(0.0, 0.0); // stop robot
 		}
 	}
-	
+
 	void leftGear () {
 		double angle = gyro.getAngle();
 		double matchTime = timer.get();
-		if (matchTime < 0.6969) {									//begin drive forward 
+		if (matchTime < 0.6969) {									//begin drive forward
 			myRobot.drive(0.75, -angle * Kp);
 		} else if ((matchTime >= 0.6969) && (matchTime < 1.9) ) {	//slow down at line
 			myRobot.drive(0.3333, -angle* Kp);
@@ -121,19 +121,19 @@ public class Robot extends IterativeRobot {
 			}
 		} else if ((matchTime >= 4.9) && (matchTime < 6.5)) {
 			myRobot.drive(0.5, -(60 - angle) * Kp);			//move forward
-			
+
 		}else if ((matchTime >= 6.5) && (matchTime < 7.0)){		//stop at gear station
 			myRobot.drive(0.0, 0.0);
 		} else if (matchTime >=7.0 && matchTime < 7.3){
 			myRobot.drive(0.0, 0.0);
 			// rightDoor.set(0.5);
 			// leftDoor.set((0.5));
-		
+
 		} else if (matchTime >= 7.3 && matchTime < 7.6){
-			
+
 			// rightDoor.set(-0.05);
-			// leftDoor.set((-0.05)); 
-		
+			// leftDoor.set((-0.05));
+
 		} else if (matchTime >= 7.6 && matchTime < 8.1) {
 			myRobot.drive(.5, -(60 - angle) *Kp);
 		/*else if ((matchTime >= 7.9) && (matchTime < 11.9)){		//back up from gear station
@@ -142,19 +142,19 @@ public class Robot extends IterativeRobot {
 			}else {
 				myRobot.drive(0.3, (-angle) * Kp);
 			}
-		} else if ( (matchTime >=11.9) && (matchTime < 13.9)) {		//drive to white line	
+		} else if ( (matchTime >=11.9) && (matchTime < 13.9)) {		//drive to white line
 			myRobot.drive(-0.5, (-angle)* Kp);
 		}*/
 		} else {
 			myRobot.drive(0.0, 0.0); // stop robot
-			
+
 		}
 	}
-	
+
 	void rightGear () {
 		double angle = gyro.getAngle();
 		double matchTime = timer.get();
-		if (matchTime < 0.6969) {									//begin drive forward 
+		if (matchTime < 0.6969) {									//begin drive forward
 			myRobot.drive(0.75, -angle * Kp);
 		} else if ((matchTime >= 0.6969) && (matchTime < 1.9) ) {	//slow down at line
 			myRobot.drive(0.3333, -angle* Kp);
@@ -172,9 +172,9 @@ public class Robot extends IterativeRobot {
 			myRobot.drive(0.0, 0.0);
 			// rightDoor.set(0.5);
 			// leftDoor.set((0.5));
-		
+
 		} else if (matchTime >= 7.3 && matchTime < 7.6){
-			
+
 			// rightDoor.set(-0.05);
 			// leftDoor.set((-0.05));
 		/*else if ((matchTime >= 7.9) && (matchTime < 11.9)){		//back up from gear station
@@ -184,21 +184,21 @@ public class Robot extends IterativeRobot {
 			}else {
 				myRobot.drive(0.3, (-angle) * Kp);
 			}
-		} else if ( (matchTime >=11.9) && (matchTime < 13.9)) {		//drive to white line	
+		} else if ( (matchTime >=11.9) && (matchTime < 13.9)) {		//drive to white line
 			myRobot.drive(-0.5, (-angle)* Kp);
-		}*/ 
+		}*/
 		} else if (matchTime >= 7.6 && matchTime < 8.1) {
 			myRobot.drive(.5, (60 - angle) *Kp);
 		} else {
 			myRobot.drive(0.0, 0.0); // stop robot
-			
+
 		}
 	}
-	
+
 	void goStraight(){
 		double angle = gyro.getAngle();
 		double matchTime = timer.get();
-		
+
 		if (matchTime < 3.0){
 			myRobot.drive(-0.5, -angle * Kp);
 		} else {
@@ -222,38 +222,38 @@ public class Robot extends IterativeRobot {
 		boolean upButton = stick.getRawButton(5);
 		boolean downButton = stick.getRawButton(6);
 		boolean openGearDoorButton = stick.getRawButton(1);
-		 
+
 		if (upButton) {
 			winch.set(0.75);
 		} else {
-			if (!downButton) 
+			if (!downButton)
 				winch.set(0.0);
 		}
-		
+
 		if (downButton) {
 			winch.set(-0.75);
 		} else {
 			if (!upButton)
 				winch.set(0.0);
 		}
-		
+
 		if (openGearDoorButton) {
 				OpenGearDoors ();
-			
+
 		} else {
 			buttonPressed = false;
 			CloseDoors();
 		}
-		
+
 		myRobot.arcadeDrive(stick, true);  // true for squaredInputs (decrease sensitivity for small inputs)
 	}
-	
+
 	void OpenGearDoors () {
 		if (!buttonPressed) {
 			buttonPressed = true;
 			doorOpenTime = System.currentTimeMillis();
 		}
-		
+
 		if ((System.currentTimeMillis() - doorOpenTime) >= 300){
 			// rightDoor.set(0.0);
 			// leftDoor.set((0.0));
@@ -261,9 +261,9 @@ public class Robot extends IterativeRobot {
 			// rightDoor.set(0.5);
 			// leftDoor.set((0.5));
 		}
-	
+
 	}
-	
+
 	void CloseDoors () {
 		// rightDoor.set(-0.05);
 		// leftDoor.set((-0.05));
@@ -276,5 +276,5 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic () {
 		LiveWindow.run();
 	}
-	
+	//Parker commit test
 }
